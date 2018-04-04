@@ -2,9 +2,6 @@
 # Copyright 1999-2018 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
 
-# Add fac (mod updater to path
-# PATH="${PATH}:/home/senth/.local/bin"
-
 extra_commands="update force_stop"
 extra_help=<<EOF
 	update update all servers and mods
