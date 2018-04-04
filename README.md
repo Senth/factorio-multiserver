@@ -44,4 +44,4 @@ fac server1 help
 * All servers are updated to experimental version. Can be changed by introducing more options in the config file, but since I only use experimental version I didn't add that functionality. Feel free to fork and create a pull request :)
 
 ## Licenses
-factorio-multiserver uses [https://github.com/Senth/fac](fac) for updating mods and [https://github.com/narc0tiq/factorio-updater](factorio-updater) for updating factorio servers
+factorio-multiserver uses [fac](https://github.com/Senth/fac) for updating mods and [factorio-updater](https://github.com/narc0tiq/factorio-updater) for updating factorio servers
