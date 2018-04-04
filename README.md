@@ -34,8 +34,8 @@ sudo /etc/init.d/factorio update #Updates both server and mods
 ### Mods
 To use fac you have to use it through the fac wrapper in `/opt/factorio/fac`. This wrapper automatically changes the config file of fac to point to the specified server. It also runs fac as the factorio user
 ```
-fac server2 install auto-research
-fac server1 --help
+/opt/factorio/fac server2 install auto-research
+/opt/factorio/fac server1 --help
 ```
 
 ## Limitations
