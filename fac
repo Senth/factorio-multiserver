@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Wrapper for fac
+
+
+server=$1
+shift
+
+source /etc/conf.d/factorio
+
+server_home="${FACTORIO_HOME}/${server}"
+
+echo "[paths]" | sudo -u ${RUN_AS_USER} tee "${FAC_CONFIG}" > /dev/null
+echo "data-path = ${server_home}/data" | sudo -u ${RUN_AS_USER} tee --append "${FAC_CONFIG}" > /dev/null
+echo "write-path = ${server_home}" | sudo -u ${RUN_AS_USER} tee --append "${FAC_CONFIG}" > /dev/null
+
+sudo -u ${RUN_AS_USER} "${FAC_EXEC}" "$@"

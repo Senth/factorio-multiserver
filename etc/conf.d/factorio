@@ -1,0 +1,21 @@
+FACTORIO_HOME="/opt/factorio"
+EXEC="bin/x64/factorio"
+RUN_AS_USER="factorio"
+UPDATE_SCRIPT="/opt/factorio/update_factorio.py"
+SERVERS=(
+	"server1"
+	"server2"
+	"server3"
+)
+
+# The same amount of elements as servers
+OPTIONS=(
+	"--start-server-load-latest --server-settings data/server-settings.json"
+	"--start-server-load-latest --server-settings data/server-settings.json"
+	"--start-server-load-latest --server-settings data/server-settings.json"
+)
+
+# FAC - MOD UPDATER
+FAC_EXEC="/home/${RUN_AS_USER}/.local/bin/fac"
+FAC_CONFIG="/home/${RUN_AS_USER}/.config/fac/config.ini"
+MODS_HOSTING_LOCATION="/var/htdocs/YOUR_DIR"

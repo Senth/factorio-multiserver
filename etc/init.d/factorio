@@ -1,0 +1,131 @@
+#!/sbin/openrc-run
+# Copyright 1999-2018 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2
+
+# Add fac (mod updater to path
+# PATH="${PATH}:/home/senth/.local/bin"
+
+extra_commands="update force_stop"
+extra_help=<<EOF
+	update update all servers and mods
+	fac Use the fac to modify a server's mods
+EOF
+
+depend() {
+	need net
+}
+
+start() {
+	ebegin "Starting Factorio servers"
+	
+	# Iterate and start all servers
+	for i in "${!SERVERS[@]}"; do
+		server="${SERVERS[$i]}"
+		start_server
+	done
+
+	eend $?
+}
+
+start_server() {
+	ebegin "Starting Factorio server: ${server}"
+	
+	server_home="${FACTORIO_HOME}/${server}"
+	server_exec="${server_home}/${EXEC}"
+	pid_file="${FACTORIO_HOME}/${server}.pid"
+	server_options=(${OPTIONS[$i]})
+
+	start-stop-daemon --start --background --make-pidfile --chdir "${server_home}" --exec "${server_exec}" --pidfile "${pid_file}" -u "${RUN_AS_USER}" -- ${server_options[@]}
+	
+	eend $?
+}
+
+force_stop() {
+	ebegin "Stopping Factorio servers"
+		
+	for i in "${!SERVERS[@]}"; do
+		server="${SERVERS[$i]}"
+		stop_server
+	done
+
+	eend $?
+}
+
+stop() {
+	ebegin "Stopping Factorio servers"
+		
+	for i in "${!SERVERS[@]}"; do
+		server="${SERVERS[$i]}"
+		stop_server
+	done
+
+	eend $?
+}
+
+stop_server() {
+	ebegin "Stopping Factorio server: ${server}"
+	
+	server_home="${FACTORIO_HOME}/${server}"
+	server_exec="${server_home}/${EXEC}"
+	pid_file="${FACTORIO_HOME}/${server}.pid"
+	server_options=(${OPTIONS[$i]})
+
+	start-stop-daemon --stop --chdir "${server_home}" --exec "${server_exec}" --pidfile "${pid_file}" -u "${RUN_AS_USER}"
+
+	eend $?
+}
+
+update_pre() {
+	service_stopped
+	running=$?
+
+	if [ $running = 1 ]; then
+		stop
+	fi
+}
+
+update() {
+	ebegin "Updating Factorio servers"
+
+	for i in "${!SERVERS[@]}"; do
+		server="${SERVERS[$i]}"
+		server_home="${FACTORIO_HOME}/${server}"
+		server_exec="${server_home}/${EXEC}"
+
+		# Update game
+		python "${UPDATE_SCRIPT}" -xDa "${server_exec}"
+
+		# Update mods
+		update_mods
+	done
+
+	eend $?
+}
+
+update_post() {
+	# Start the service agoin if it was running
+	if [ $running = 1 ]; then
+		start
+	fi
+}
+
+update_mods() {
+	# Write config file to use correct game
+	sudo -u ${RUN_AS_USER} echo "[paths]" > "${FAC_CONFIG}"
+	sudo -u ${RUN_AS_USER} echo "data-path = ${server_home}/data" >> "${FAC_CONFIG}"
+	sudo -u ${RUN_AS_USER} echo "write-path = ${server_home}" >> "${FAC_CONFIG}"
+
+	sudo -u ${RUN_AS_USER} "${FAC_EXEC}" update -y
+
+	# Copy mods to hosting location
+	mods_hosting_dir="${MODS_HOSTING_LOCATION}/mods-${server}"
+	mods_hosting_zip="${mods_hosting_dir}.zip"
+
+	sudo -u ${RUN_AS_USER} rm -rf "${mods_hosting_dir}" "${mods_hosting_zip}"
+	sudo -u ${RUN_AS_USER} cp -r "${server_home}/mods" "${mods_hosting_dir}"
+	
+	# Create zip
+	cd "${server_home}"
+	sudo -u ${RUN_AS_USER} zip -r "${mods_hosting_zip}" "mods"
+	cd -
+}
