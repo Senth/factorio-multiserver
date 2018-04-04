@@ -37,7 +37,7 @@ To use fac you have to use it through the fac wrapper in `/opt/factorio/fac`. Th
 /opt/factorio/fac server2 install auto-research
 /opt/factorio/fac server1 --help
 ```
-(Usage options)[https://github.com/Senth/fac#usage]
+[Usage options](https://github.com/Senth/fac#usage)
 
 ## Limitations
 
